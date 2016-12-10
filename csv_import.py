@@ -1,8 +1,8 @@
 import csv
 from collections import defaultdict
 
-SOURCE_FILENAME = 'data/OpFistula_ISOFS_2016_named_csv_2.csv'
-TARGET_FILENAME = 'cleaned_csv.csv'
+SOURCE_FILENAME = 'data/csv_source.csv'
+TARGET_FILENAME = 'merged_csv.csv'
 BLANK_DATA = '.'
 COLUMN_TITLES_INCLUDES = ['your_name', 'country', 'details', 'hospital']
 CELL_SEPARATOR = ';'
