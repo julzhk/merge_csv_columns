@@ -1,10 +1,10 @@
 import csv
 from collections import defaultdict
 
-SOURCE_FILENAME = 'data/csv_source.csv'
-TARGET_FILENAME = 'merged_csv.csv'
+SOURCE_FILENAME = 'data/sample.csv'
+TARGET_FILENAME = 'results.csv'
 BLANK_DATA = '.'
-COLUMN_TITLES_INCLUDES = ['your_name', 'country', 'details', 'hospital']
+MERGED_COLUMN_IF_TITLES_INCLUDES = ['your_name', 'country', 'details', 'hospital']
 CELL_SEPARATOR = ';'
 CONVERT_CSV_SEPARATOR = '_'
 
@@ -44,32 +44,32 @@ def read_file_make_list_of_dicts(column_titles, data_source_fn):
     :param data_source_fn: filename of data source csv
     :return: the titles (keys) & data : list of  dicts)
     """
-    rows = []
+    results_rows = []
     with open(data_source_fn) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            current_row = defaultdict(list)
-            for cell in row.copy():
-                for aggregated_column in COLUMN_TITLES_INCLUDES:
-                    if aggregated_column in cell:
-                        if_not_blank_append_to_cell(cell, current_row, row)
-                else:
-                    current_row[cell.replace(BLANK_DATA, CONVERT_CSV_SEPARATOR)].append(row[cell])
+            current_results_row = defaultdict(list)
+            for column_title in row.copy():
+                result_column = column_title
+                for mergable_column_title in MERGED_COLUMN_IF_TITLES_INCLUDES:
+                    if mergable_column_title in column_title:
+                        result_column = mergable_column_title
+                        break
+                append_to_results_cell(result_column, column_title, current_results_row, row)
             # get column titles (ignore duplicates)
-            column_titles |= set(current_row.keys())
-            rows.append(current_row)
-    return column_titles, rows
+            column_titles |= set(current_results_row.keys())
+            results_rows.append(current_results_row)
+    return column_titles, results_rows
+
+
+def append_to_results_cell(results_column_title, source_column_title, current_row, row):
+    current_row[results_column_title.replace(BLANK_DATA, CONVERT_CSV_SEPARATOR)].append(row[source_column_title])
 
 
 def convert_list_to_string(ele, row):
     if type(row[ele]) == list:
         row[ele] = CELL_SEPARATOR.join(row[ele])
 
-
-def if_not_blank_append_to_cell(k, r, row):
-    if row[k] != BLANK_DATA:
-        r[k].append(row[k])
-
-
 if __name__ == '__main__':
     main()
+
